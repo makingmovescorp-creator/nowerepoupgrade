@@ -1,0 +1,157 @@
+/* Custom RainbowKit styles to match our widget theme */
+
+/* Override RainbowKit's default styles with more specific selectors */
+
+/* Modal backdrop - more specific selector */
+div[data-rk] > div[role="dialog"] > div:first-child {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+/* Modal container - target the actual modal div */
+div[data-rk] > div[role="dialog"] > div:last-child {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(4px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+}
+
+/* Modal content */
+div[data-rk] > div[role="dialog"] > div:last-child > div {
+  background-color: transparent !important;
+}
+
+/* Connect button - target the actual button */
+div[data-rk] button[data-testid="rk-connect-button"],
+div[data-rk] button[data-testid="rk-account-button"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+}
+
+div[data-rk] button[data-testid="rk-connect-button"]:hover,
+div[data-rk] button[data-testid="rk-account-button"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Modal text colors */
+div[data-rk] h1,
+div[data-rk] h2,
+div[data-rk] h3,
+div[data-rk] p,
+div[data-rk] span,
+div[data-rk] div {
+  color: #ffffff !important;
+}
+
+/* Secondary text */
+div[data-rk] p[data-testid="rk-text-secondary"],
+div[data-rk] span[data-testid="rk-text-secondary"] {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Wallet options in modal */
+div[data-rk] button[data-testid="rk-wallet-option"],
+div[data-rk] div[data-testid="rk-wallet-option"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+  margin: 4px 0 !important;
+}
+
+div[data-rk] button[data-testid="rk-wallet-option"]:hover,
+div[data-rk] div[data-testid="rk-wallet-option"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Selected wallet option */
+div[data-rk] button[data-testid="rk-wallet-option"][data-selected="true"],
+div[data-rk] div[data-testid="rk-wallet-option"][data-selected="true"] {
+  border-color: rgba(16, 185, 129, 0.2) !important;
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Close button */
+div[data-rk] button[data-testid="rk-modal-close"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 6px !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+}
+
+div[data-rk] button[data-testid="rk-modal-close"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+}
+
+/* Chain selector */
+div[data-rk] button[data-testid="rk-chain-selector"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+}
+
+div[data-rk] button[data-testid="rk-chain-selector"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Menu items */
+div[data-rk] button[data-testid="rk-menu-item"],
+div[data-rk] div[data-testid="rk-menu-item"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+  margin: 2px 0 !important;
+}
+
+div[data-rk] button[data-testid="rk-menu-item"]:hover,
+div[data-rk] div[data-testid="rk-menu-item"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Force override for all modal elements */
+div[data-rk] [role="dialog"] {
+  background-color: rgba(0, 0, 0, 0.4) !important;
+  backdrop-filter: blur(4px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+}
+
+/* Override any remaining background colors */
+div[data-rk] [role="dialog"] * {
+  background-color: transparent !important;
+}
+
+/* Ensure text is visible */
+div[data-rk] [role="dialog"] * {
+  color: #ffffff !important;
+}
+
+/* RainbowKit specific hover overrides - only for modal content */
+div[data-rk] [role="dialog"] button:hover,
+div[data-rk] [role="dialog"] div[role="button"]:hover,
+div[data-rk] [role="dialog"] a:hover,
+div[data-rk] [role="dialog"] [data-testid*="button"]:hover,
+div[data-rk] [role="dialog"] [data-testid*="option"]:hover,
+div[data-rk] [role="dialog"] [data-testid*="item"]:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* RainbowKit specific button styles - only for modal content */
+div[data-rk] [role="dialog"] button,
+div[data-rk] [role="dialog"] div[role="button"],
+div[data-rk] [role="dialog"] a,
+div[data-rk] [role="dialog"] [data-testid*="button"],
+div[data-rk] [role="dialog"] [data-testid*="option"],
+div[data-rk] [role="dialog"] [data-testid*="item"] {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  border-radius: 8px !important;
+  transition: all 0.15s ease !important;
+}
