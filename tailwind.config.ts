@@ -45,6 +45,17 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // Custom app colors
+        'black-1': '#0a0a0a',
+        'black-2': '#1a1a1a',
+        'black-3': '#2a2a2a',
+        'black-border': '#333333',
+        'gray-txt': '#666666',
+        'gray-bright': '#888888',
+        'purple': '#6144e5',
+        'purple-bright': '#7c5cf0',
+        'modal': 'rgba(0, 0, 0, 0.4)',
+        'modal-title': 'rgba(0, 0, 0, 0.6)',
       },
       borderRadius: {
         lg: 'var(--radius)',

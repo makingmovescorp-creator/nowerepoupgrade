@@ -31,14 +31,20 @@ const TokenModal: React.FC<ModalProps> = ({
   const [filteredTokens, setFilteredTokens] = useState<any[] | undefined>(undefined);
 
   const filterTokens = useCallback(() => {
+    // Don't filter if required props are not available
+    if (!otherToken || !opToken) {
+      setFilteredTokens([]);
+      return;
+    }
+
     const source = TOKEN_LIST || [];
     const filtered = source.filter((token: any) => {
       return (
         (strstr(token.symbol, searchStr) ||
           strstr(token.name, searchStr) ||
           strstr(token.address, searchStr)) &&
-        (otherToken.address.toLowerCase() != token.address.toLowerCase()) &&
-        (opToken.address.toLowerCase() != token.address.toLowerCase())
+        (otherToken?.address?.toLowerCase() != token.address?.toLowerCase()) &&
+        (opToken?.address?.toLowerCase() != token.address?.toLowerCase())
       );
     });
     setFilteredTokens(filtered);
@@ -74,6 +80,7 @@ const TokenModal: React.FC<ModalProps> = ({
   };
 
   function strstr(string1: string, string2: string): boolean {
+    if (!string1 || !string2) return false;
     return string1.toLowerCase().includes(string2.toLowerCase());
   }
 
@@ -82,7 +89,19 @@ const TokenModal: React.FC<ModalProps> = ({
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const getTokenIcon = (symbol: string) => '/img/token_icons/empty.png';
+  const getTokenIcon = (symbol: string) => {
+    const iconMap: { [key: string]: string } = {
+      'PLS': '/icons/WPLS.avif', // Native PLS uses WPLS icon
+      'WPLS': '/icons/WPLS.avif',
+      'PLSX': '/icons/plsx.avif',
+      'WETH': '/icons/eth.avif',
+      'HEX': '/icons/hex.avif',
+      'pDAI': '/icons/dai.avif',
+      'pUSDC': '/icons/usdc.avif',
+      'pWBTC': '/icons/pwbtc.avif',
+    };
+    return iconMap[symbol] || '/icons/WPLS.avif'; // Default to WPLS icon
+  };
 
   return (
     <div

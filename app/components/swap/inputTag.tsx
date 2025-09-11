@@ -20,6 +20,7 @@ export default function InputTag(props: any) {
     setIsInsufficient,
     USDprice,
     showMAXbtn,
+    showTokenSelect = true,
   } = props;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,7 +39,19 @@ export default function InputTag(props: any) {
     setAmount(value);
   };
 
-  const getTokenIcon = (symbol: string) => '/img/token_icons/empty.png';
+  const getTokenIcon = (symbol: string) => {
+    const iconMap: { [key: string]: string } = {
+      'PLS': '/icons/WPLS.avif', // Native PLS uses WPLS icon
+      'WPLS': '/icons/WPLS.avif',
+      'PLSX': '/icons/plsx.avif',
+      'WETH': '/icons/eth.avif',
+      'HEX': '/icons/hex.avif',
+      'pDAI': '/icons/dai.avif',
+      'pUSDC': '/icons/usdc.avif',
+      'pWBTC': '/icons/pwbtc.avif',
+    };
+    return iconMap[symbol] || '/icons/WPLS.avif'; // Default to WPLS icon
+  };
 
   return (
     <>
@@ -48,7 +61,7 @@ export default function InputTag(props: any) {
         </div>
       </div>
       <div
-        className={`flex relative justify-between w-[100%] sm:h-[66px] h-[50px] border border-black-border px-[15px] -mt-[11px]`}
+        className={`flex relative justify-between w-[100%] sm:h-[50px] h-[42px] border border-black-border px-[15px] -mt-[11px]`}
       >
         <InputLoadingGif isLoading={isAmountCalcing} />
 
@@ -65,18 +78,9 @@ export default function InputTag(props: any) {
           type="number"
           className={`${
             isAmountCalcing ? "text-[#666]" : "text-white"
-          } numberInput bg-transparent disabled:cursor-not-allowed w-[60%] text-left outline-none sm:text-[24px] text-[20px] font-mono sm:h-[65px] h-[50px] transition-colors`}
+          } numberInput bg-transparent disabled:cursor-not-allowed w-[60%] text-left outline-none text-sm font-medium sm:h-[50px] h-[42px] transition-colors`}
           placeholder="0"
         />
-        <div className="flex justify-items-end items-center">
-          {USDprice == 0 ? (
-            <></>
-          ) : (
-            <h1 className="text-right font-mono text-balance text-sm">
-              ${Number(USDprice).toFixed(3)}
-            </h1>
-          )}
-        </div>
         {showMAXbtn ? (
           <div
             onClick={() => {
@@ -85,40 +89,58 @@ export default function InputTag(props: any) {
             }}
             className="flex justify-items-end items-center pl-3 hover:cursor-pointer"
           >
-            <h1 className="text-right font-mono text-white hover:text-balance transition-3 text-[18px]">
+            <h1 className="text-right text-white hover:text-balance transition-3 text-xs font-medium">
               MAX
             </h1>
           </div>
         ) : (
           <></>
         )}
-        <div className="flex items-center justify-center bg-gray-100">
-          <button
-            onClick={openModal}
-            className="w-full inline-flex items-center gap-2 py-1.5 px-3 sm:text-[18px] text-[15px] font-semi text-white shadow-white/10 focus:outline-none data-[hover]:bg-gray-700 data-[open]:bg-gray-700 data-[focus]:outline-none"
-          >
-            <div className="flex gap-3 place-items-center">
-              <div className="flex justify-center place-items-center relative w-5 h-5 ">
-                <Image
-                  className="rounded-full"
-                  src={getTokenIcon(token.symbol)}
-                  fill
-                  alt=""
-                />
+        {showTokenSelect ? (
+          <div className="flex items-center justify-center">
+            <button
+              onClick={openModal}
+              className="w-full inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-white shadow-white/10 focus:outline-none data-[hover]:bg-gray-700 data-[open]:bg-gray-700 data-[focus]:outline-none"
+            >
+              <div className="flex gap-3 place-items-center">
+                <div className="flex justify-center place-items-center relative w-5 h-5 ">
+                  <Image
+                    className="rounded-full"
+                    src={getTokenIcon(token.symbol)}
+                    fill
+                    alt=""
+                  />
+                </div>
+                {token.symbol}
               </div>
-              {token.symbol}
+              <MdOutlineKeyboardArrowDown className="text-lg" />
+            </button>
+            <TokenModal
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              opToken={opToken}
+              title="Select a token"
+              otherToken={token}
+              setToken={setToken}
+            />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center">
+            <div className="w-full inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-white">
+              <div className="flex gap-3 place-items-center">
+                <div className="flex justify-center place-items-center relative w-5 h-5 ">
+                  <Image
+                    className="rounded-full"
+                    src={getTokenIcon(token.symbol)}
+                    fill
+                    alt=""
+                  />
+                </div>
+                {token.symbol}
+              </div>
             </div>
-            <MdOutlineKeyboardArrowDown className="text-[27px] font-bold" />
-          </button>
-          <TokenModal
-            isOpen={isModalOpen}
-            onClose={closeModal}
-            opToken={opToken}
-            title="Select a token"
-            otherToken={token}
-            setToken={setToken}
-          />
-        </div>
+          </div>
+        )}
       </div>
     </>
   );

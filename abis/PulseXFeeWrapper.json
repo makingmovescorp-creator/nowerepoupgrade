@@ -1,2 +1,56 @@
-{ "abi": [] }
-
+{
+  "abi": [
+    {
+      "type": "function",
+      "name": "swapExactTokensForTokens",
+      "inputs": [
+        {"name": "amountIn", "type": "uint256"},
+        {"name": "amountOutMin", "type": "uint256"},
+        {"name": "path", "type": "address[]"},
+        {"name": "to", "type": "address"},
+        {"name": "deadline", "type": "uint256"}
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "swapExactETHForTokens",
+      "inputs": [
+        {"name": "amountOutMin", "type": "uint256"},
+        {"name": "path", "type": "address[]"},
+        {"name": "to", "type": "address"},
+        {"name": "deadline", "type": "uint256"}
+      ],
+      "outputs": [],
+      "stateMutability": "payable"
+    },
+    {
+      "type": "function",
+      "name": "swapExactTokensForETH",
+      "inputs": [
+        {"name": "amountIn", "type": "uint256"},
+        {"name": "amountOutMin", "type": "uint256"},
+        {"name": "path", "type": "address[]"},
+        {"name": "to", "type": "address"},
+        {"name": "deadline", "type": "uint256"}
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "WPLS",
+      "inputs": [],
+      "outputs": [{"name": "", "type": "address"}],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "feeBps",
+      "inputs": [],
+      "outputs": [{"name": "", "type": "uint256"}],
+      "stateMutability": "view"
+    }
+  ]
+}

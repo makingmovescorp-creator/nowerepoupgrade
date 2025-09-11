@@ -55,11 +55,24 @@ export default function ConnectWalletButton({
                 return (
                   <button
                     onClick={openConnectModal}
-                    className="w-[100%] sm:h-[46px] h-[38px] transition duration-500 bg-purple hover:bg-purple-bright"
+                    type="button"
+                    className="w-full px-4 py-2 text-white text-sm font-medium rounded-lg transition-all duration-150"
+                    style={{ 
+                      background: 'linear-gradient(30deg, rgba(0, 255, 85, 0.8) 0%, rgba(0, 255, 153, 0.8) 100%)',
+                      border: 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(30deg, rgba(0, 255, 102, 0.8) 0%, rgba(0, 255, 170, 0.8) 100%)';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 255, 85, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(30deg, rgba(0, 255, 85, 0.8) 0%, rgba(0, 255, 153, 0.8) 100%)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
-                    <h1 className="font-mono text-white sm:text-[21px] text-[18px]">
-                      Connect Wallet
-                    </h1>
+                    Connect Wallet
                   </button>
                 );
               }
@@ -67,11 +80,24 @@ export default function ConnectWalletButton({
                 return (
                   <button
                     onClick={switchChainHandle}
-                    className="w-[100%] sm:h-[46px] h-[38px]  transition duration-500 bg-purple hover:bg-purple-bright"
+                    type="button"
+                    className="w-full px-4 py-2 text-white text-sm font-medium rounded-lg transition-all duration-150"
+                    style={{ 
+                      background: 'linear-gradient(30deg, rgba(0, 255, 85, 0.8) 0%, rgba(0, 255, 153, 0.8) 100%)',
+                      border: 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(30deg, rgba(0, 255, 102, 0.8) 0%, rgba(0, 255, 170, 0.8) 100%)';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 255, 85, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(30deg, rgba(0, 255, 85, 0.8) 0%, rgba(0, 255, 153, 0.8) 100%)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
-                    <h1 className="font-mono text-white sm:text-[21px] text-[18px]">
-                      Switch network
-                    </h1>
+                    Switch network
                   </button>
                 );
               }
@@ -81,7 +107,21 @@ export default function ConnectWalletButton({
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="w-full py-3 bg-green-600  mt-4 text-xl rounded-xl hover:shadow-button hover:shadow-blue-400 hover:text-blue-400 text-orange-700 uppercase tracking-widest"
+                    className="w-full px-4 py-2 text-white text-sm font-medium rounded-lg transition-all duration-150"
+                    style={{ 
+                      background: 'linear-gradient(-30deg, rgba(255, 0, 0, 0.8) 0%, rgba(255, 0, 51, 0.8) 100%)',
+                      border: 'none'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(-30deg, rgba(255, 17, 17, 0.8) 0%, rgba(255, 17, 68, 0.8) 100%)';
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 0, 0, 0.3)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(-30deg, rgba(255, 0, 0, 0.8) 0%, rgba(255, 0, 51, 0.8) 100%)';
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
                   >
                     Wrong network
                   </button>
