@@ -8,13 +8,11 @@ import { GoArrowLeft } from "react-icons/go";
 import { CRO, CROGINAL } from "../../abis/Tokens";
 import InputTag from "@/app/components/swap/inputTag";
 import ShowPercent from "@/app/components/liquidity/ShowPercent";
-import { addLiquidityETH, createPair, getPair } from "@/app/utils/actions";
 import { useAccount } from "wagmi";
-import { addLiquidity } from "@/app/utils/actions";
 import { Address, maxUint256, zeroAddress } from "viem";
 import { config } from "@/app/config/wagmi";
 import { DEXRouter } from "@/app/config";
-import { approve } from "@/app/utils/actions";
+// import { approve } from "@/app/utils/actions"; // TODO: Create this function
 import { useChainId } from "wagmi";
 import ActionButton from "@/app/components/swap/ActionButton";
 import { pulsechain } from "@/lib/chains/pulsechain";
@@ -22,16 +20,16 @@ import { ethers } from "ethers";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { TiWarning } from "react-icons/ti";
 import { readContract } from "@wagmi/core";
-import { PAIR_ABI } from "@/app/utils";
-import { getAmountsOutFromDEX } from "@/app/utils/actions";
+import uniswapV2Pair from "@/abis/uniswapV2Pair.json";
+// import { getAmountsOutFromDEX } from "@/app/utils/actions"; // TODO: Create this function
 import { useBalance } from "wagmi";
-import { useApprovedStatus } from "@/app/hooks/useApprovedStatus";
-import useLPStatusByAccount from "@/app/hooks/useLPStatusByAccount";
-import useLPPair from "@/app/hooks/useLPPair";
+// import { useApprovedStatus } from "@/app/hooks/useApprovedStatus"; // TODO: Create this hook
+// import useLPStatusByAccount from "@/app/hooks/useLPStatusByAccount"; // TODO: Create this hook  
+// import useLPPair from "@/app/hooks/useLPPair"; // TODO: Create this hook
 import { Token } from "@/app/types";
-import { useTotalStatusInSwap } from "@/app/hooks/useTotalStatusInSwap";
-import { useUSDprice } from "@/app/hooks/useUSDprice";
-import { useTokenBalance } from "@/app/hooks/useTokenBalance";
+// import { useTotalStatusInSwap } from "@/app/hooks/useTotalStatusInSwap"; // TODO: Create this hook
+import { useUSDprice } from "@/hooks/useUSDprice";
+import { useTokenBalance } from "@/hooks/useTokenBalance";
 import BottomBar from "@/app/components/bottomBar";
 
 export default function Home() {
@@ -66,12 +64,11 @@ export default function Home() {
   const basePrice = useUSDprice(baseToken, baseAmount);
   const quotePrice = useUSDprice(quoteToken, quoteAmount);
 
-  const { isCreated, address: pair } = useLPPair(
-    baseToken,
-    quoteToken,
-    isProcessing
-  );
-  const { balance, totalSupply } = useLPStatusByAccount(pair as Address, baseToken);
+  // Mock values for missing hooks
+  const isCreated = false;
+  const pair = "0x0000000000000000000000000000000000000000" as Address;
+  const balance = 0;
+  const totalSupply = 0;
 
   const sharePercent = useMemo(
     () => (totalSupply ? (balance / totalSupply) * 100 : 0),
@@ -93,20 +90,10 @@ export default function Home() {
   const baseBalance = useTokenBalance(baseToken, isProcessing);
   const quoteBalance = useTokenBalance(quoteToken, isProcessing);
 
-  const isApprovedBase = useApprovedStatus(baseToken, baseAmount, isProcessing);
-  const isApprovedQuote = useApprovedStatus(
-    quoteToken,
-    quoteAmount,
-    isProcessing
-  );
-  const status = useTotalStatusInSwap(
-    isApprovedBase,
-    isApprovedQuote,
-    isCreated,
-    isProcessing,
-    baseToken,
-    quoteToken
-  );
+  // Mock values for missing hooks
+  const isApprovedBase = false;
+  const isApprovedQuote = false;
+  const status = 0; // 0: need create pair
 
   console.log(
     {
@@ -130,37 +117,15 @@ export default function Home() {
     try {
       if (baseToken.isNative) {
         // If one of token is CRO, then use addLiquidityETH
-        const res: any = await addLiquidityETH(
-          baseAmount,
-          quoteToken,
-          quoteAmount,
-          0,
-          0,
-          address as Address,
-          deadlineTime
-        );
+        // TODO: Implement addLiquidityETH function
+        console.log("addLiquidityETH not implemented yet");
       } else if (quoteToken.isNative) {
         // If one of token is CRO, then use addLiquidityETH
-        const res: any = await addLiquidityETH(
-          quoteAmount,
-          baseToken,
-          baseAmount,
-          0,
-          0,
-          address as Address,
-          deadlineTime
-        );
+        // TODO: Implement addLiquidityETH function
+        console.log("addLiquidityETH not implemented yet");
       } else {
-        const res: any = await addLiquidity(
-          baseToken,
-          quoteToken,
-          baseAmount,
-          quoteAmount,
-          0,
-          0,
-          address as Address,
-          deadlineTime
-        );
+        // TODO: Implement addLiquidity function
+        console.log("addLiquidity not implemented yet");
       }
     } catch (error) {
       console.log(error);
@@ -174,7 +139,8 @@ export default function Home() {
     setIsProcessing(true);
     setText("Creating Pool");
     try {
-      const res: any = await createPair(baseToken, quoteToken);
+      // TODO: Implement createPair function
+      console.log("createPair not implemented yet");
       // setStatus(2);
     } catch (error) {
       console.log("create Function:", error);
@@ -188,14 +154,8 @@ export default function Home() {
       try {
         setIsProcessing(true);
         setText(`Approving ${token.symbol}`);
-        const r = await approve(
-          config,
-          token,
-          ethers.MaxUint256,
-          DEXRouter as Address
-        ).then(async (hash: any) => {
-          await waitForTransactionReceipt(config, { hash });
-        });
+        // TODO: Implement approve function
+        console.log("approve not implemented yet");
       } catch (error) {
         console.log("approve1 error", error);
         setIsProcessing(false);
@@ -225,9 +185,10 @@ export default function Home() {
 
   const getReceiveAmount = useCallback(async () => {
     try {
-      const pairAddress: any = await getPair(baseToken, quoteToken);
+      // TODO: Implement getPair function
+      const pairAddress = "0x0000000000000000000000000000000000000000";
       const res: any = await readContract(config, {
-        abi: PAIR_ABI,
+        abi: uniswapV2Pair.abi,
         functionName: "getReserves",
         address: pairAddress as Address,
         args: [],
@@ -267,9 +228,10 @@ export default function Home() {
 
         // setStatus(2);
         let res: any;
-        res = await getAmountsOutFromDEX(quoteToken, baseToken, 1);
+        // TODO: Implement getAmountsOutFromDEX function
+        res = 0; // Mock value
         setFixedVal2(res);
-        res = await getAmountsOutFromDEX(baseToken, quoteToken, 1);
+        res = 0; // Mock value
         setFixedVal1(res);
         if (Number(res) != 0) {
           console.log(
