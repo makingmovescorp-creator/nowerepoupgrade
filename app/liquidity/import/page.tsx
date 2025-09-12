@@ -9,15 +9,15 @@ import { GoArrowLeft } from "react-icons/go";
 import TokenModal from "@/app/components/swap/tokenModal";
 import { DEXRouter } from "@/app/config";
 import { SlArrowDown } from "react-icons/sl";
-import { getPair, removeLiquidity } from "@/app/utils/actions";
+// import { getPair, removeLiquidity } from "@/app/utils/actions"; // TODO: Create these functions
 import { toast } from "react-toastify";
 import { Address, maxUint256, zeroAddress } from "viem";
 import { useAccount, useSwitchAccount } from "wagmi";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
-import { Abis, DEX_ABI, PAIR_ABI } from "@/app/utils";
+// import { Abis, DEX_ABI, PAIR_ABI } from "@/app/utils"; // TODO: Create these constants
 import { readContract, writeContract } from "@wagmi/core";
 import { config } from "@/app/config/wagmi";
-import { removeLiquidityETH } from "@/app/utils/actions";
+// import { removeLiquidityETH } from "@/app/utils/actions"; // TODO: Create this function
 import ShowBalance from "@/app/components/swap/showBalance";
 import { LuArrowDown } from "react-icons/lu";
 // import { Slider } from "@nextui-org/react";
@@ -32,10 +32,11 @@ import { useChainId } from "wagmi";
 import { pulsechain } from "@/lib/chains/pulsechain";
 import { ethers } from "ethers";
 import { NATIVE_TOKEN, TOKEN_LIST } from "@/app/abis/Tokens";
-import useLPStatusByAccount from "@/app/hooks/useLPStatusByAccount";
-import useLPPair from "@/app/hooks/useLPPair";
-import { ERC20_ABI } from "../../utils";
-import { useApprovedStatusPair } from "@/app/hooks/useApprovedStatusPair";
+// import useLPStatusByAccount from "@/app/hooks/useLPStatusByAccount"; // TODO: Create this hook
+// import useLPPair from "@/app/hooks/useLPPair"; // TODO: Create this hook
+import erc20 from "@/abis/erc20.json";
+import uniswapV2Pair from "@/abis/uniswapV2Pair.json";
+// import { useApprovedStatusPair } from "@/app/hooks/useApprovedStatusPair"; // TODO: Create this hook
 import BottomBar from "@/app/components/bottomBar";
 
 export default function Home() {
@@ -68,30 +69,22 @@ export default function Home() {
 
   // const [receiveOutOrder, setReceiveOutOrder] = useState<boolean>(false); // false: show origin,  true: show mirrow == Cro / croginal or croginal / cro
 
-  const { isCreated, address: pair } = useLPPair(
-    baseToken,
-    quoteToken,
-    isSwapping
-  );
-  const {
-    balance,
-    totalSupply,
-    receiveBaseAmount,
-    receiveQuoteAmount,
-    receiveOutOrder,
-  } = useLPStatusByAccount(pair as Address, baseToken);
+  // Mock values for missing hooks
+  const isCreated = false;
+  const pair = "0x0000000000000000000000000000000000000000" as Address;
+  const balance = 0;
+  const totalSupply = 0;
+  const receiveBaseAmount = 0;
+  const receiveQuoteAmount = 0;
+  const receiveOutOrder = false;
 
   const sharePercent = useMemo(
     () => (totalSupply ? (balance / totalSupply) * 100 : 0),
     [balance, totalSupply]
   );
 
-  const removeStatus = useApprovedStatusPair(
-    pair as Address,
-    DEXRouter,
-    amount,
-    isSwapping
-  );
+  // Mock value for missing hook
+  const removeStatus = false;
 
   const poolStatus = useMemo(() => {
     return balance ? true : false;
@@ -114,18 +107,12 @@ export default function Home() {
     console.log("deadline", deadlineTime);
 
     if (baseToken.isNative || quoteToken.isNative) {
-      const pairAddress: any = await getPair(baseToken, quoteToken);
+      // TODO: Implement getPair function
+      const pairAddress = "0x0000000000000000000000000000000000000000";
       console.log("RemovePairAdd", pairAddress);
       try {
-        const res: any = await removeLiquidityETH(
-          baseToken.isNative ? quoteToken : baseToken,
-          pairAddress,
-          amount,
-          0,
-          0,
-          address as Address,
-          deadlineTime
-        );
+        // TODO: Implement removeLiquidityETH function
+        console.log("removeLiquidityETH not implemented yet");
         setIsSwapping(false);
       } catch (error) {
         console.log("Error in removeLiquidityETH", error);
@@ -133,31 +120,21 @@ export default function Home() {
       return;
     }
     try {
-      // else, addLiquidity
-      const res: any = await removeLiquidity(
-        baseToken,
-        quoteToken,
-        amount,
-        0,
-        0,
-        address as Address,
-        deadlineTime
-      );
-      console.log("&&&", res);
+      // TODO: Implement removeLiquidity function
+      console.log("removeLiquidity not implemented yet");
       setIsSwapping(false);
-      console.log("removeremoveremove", res);
     } catch (error) {
-      console.log("Error in removeLiquidityETH", error);
+      console.log("Error in removeLiquidity", error);
     }
     // }
   }, [baseToken, quoteToken, amount, sliderPercent]);
 
   const ApproveForRemove = useCallback(async () => {
     setIsSwapping(true);
-    const pairAddress: any = await getPair(baseToken, quoteToken);
+    // TODO: Implement getPair function
+    const pairAddress = "0x0000000000000000000000000000000000000000";
     console.log("pairaddress is ", pairAddress);
-    const abi =
-      baseToken.isNative || quoteToken.isNative ? PAIR_ABI : ERC20_ABI;
+    const abi = baseToken.isNative || quoteToken.isNative ? uniswapV2Pair.abi : erc20.abi;
 
     const allowance = await readContract(config, {
       abi,
@@ -523,7 +500,7 @@ export default function Home() {
                 </div>
                 {!isConnected || chainId != pulsechain.id ? (
                   <ActionButton callback={undefined} />
-                ) : removeStatus == true ? (
+                ) : removeStatus ? (
                   <>
                     <button
                       onClick={Remove}
