@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import ChartWidget from '@/app/components/ChartWidget';
 import TradePanel from '@/app/components/TradePanel';
 import PortfolioWidget from '@/app/components/PortfolioWidget';
@@ -10,15 +11,23 @@ import { Card } from '@/components/ui/card';
 
 export default function Page() {
   return (
+    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
+      <HomeContent />
+    </Suspense>
+  );
+}
+
+function HomeContent() {
+  return (
     <main className="min-h-screen text-neutral-100 relative">
       <ShaderBackground />
       {/* Top bar (Hyperliquid-like) */}
       <header className="sticky top-0 z-30 border-b border-white/5 bg-black/40 backdrop-blur-md">
         <div className="mx-auto max-w-[1600px] px-4 py-3 flex items-center justify-between">
                  <div className="flex items-center gap-4">
-                   <img 
-                     src="/img/pulsexpro-white.avif" 
-                     alt="PulseX Pro" 
+                   <img
+                     src="/img/pulsexpro-white.avif"
+                     alt="PulseX Pro"
                      className="h-8 w-auto"
                    />
                    <nav className="hidden md:flex items-center gap-3 text-sm text-neutral-400">
@@ -31,30 +40,30 @@ export default function Page() {
           <div className="flex items-center gap-3">
             <div className="relative group">
               <button className="flex items-center gap-1 hover:bg-white/5 rounded-md p-1 transition">
-                <img 
-                  src="/icons/WPLS.avif" 
-                  alt="PulseChain" 
+                <img
+                  src="/icons/WPLS.avif"
+                  alt="PulseChain"
                   className="h-4 w-4"
                 />
                 <svg className="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              
+
               {/* Dropdown menu */}
               <div className="absolute top-full left-0 mt-1 bg-black/90 backdrop-blur-md border border-white/10 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 w-12">
                 <div className="py-1">
                   <button className="w-full flex items-center justify-center p-2 text-sm text-neutral-300 hover:bg-white/10 transition rounded">
-                    <img 
-                      src="/icons/WPLS.avif" 
-                      alt="PulseChain" 
+                    <img
+                      src="/icons/WPLS.avif"
+                      alt="PulseChain"
                       className="h-4 w-4"
                     />
                   </button>
                   <button className="w-full flex items-center justify-center p-2 text-sm text-neutral-300 hover:bg-white/10 transition rounded cursor-not-allowed" disabled>
-                    <img 
-                      src="/icons/eth.avif" 
-                      alt="Ethereum" 
+                    <img
+                      src="/icons/eth.avif"
+                      alt="Ethereum"
                       className="h-4 w-4 opacity-50"
                     />
                   </button>
@@ -72,15 +81,15 @@ export default function Page() {
         <section className="col-span-12 lg:col-span-9 flex flex-col gap-1">
           {/* Favorite pairs bar */}
           <FavoritePairsBar />
-          
+
           {/* Pair select widget */}
           <PairSelectWidget />
-          
+
           {/* Chart section - większa część */}
           <Card className="flex-[3]">
             <ChartWidget />
           </Card>
-          
+
           {/* Portfolio section - mniejsza część */}
           <div className="flex-[1]">
             <PortfolioWidget />

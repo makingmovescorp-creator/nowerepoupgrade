@@ -16,7 +16,7 @@ import { useAccount, useSwitchAccount } from "wagmi";
 import { IoIosRemoveCircleOutline } from "react-icons/io";
 import { PAIR_ABI } from "@/lib/utils";
 import { readContract, writeContract } from "@wagmi/core";
-import { config } from "@/app/config/wagmi";
+import { wagmiConfig as config } from "@/lib/wallet";
 import ShowBalance from "@/app/components/swap/showBalance";
 import { LuArrowDown } from "react-icons/lu";
 // import { Slider } from "@nextui-org/react";

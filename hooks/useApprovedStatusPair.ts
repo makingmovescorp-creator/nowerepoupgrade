@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Address } from 'viem';
 import { readContract } from '@wagmi/core';
-import { config } from '@/app/config/wagmi';
+import { wagmiConfig as config } from '@/lib/wallet';
 import { useAccount } from 'wagmi';
 
 export function useApprovedStatusPair(

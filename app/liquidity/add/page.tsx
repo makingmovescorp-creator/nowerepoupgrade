@@ -12,7 +12,7 @@ import { addLiquidityETH, createPair, getPair } from "@/lib/actions";
 import { useAccount } from "wagmi";
 import { addLiquidity } from "@/lib/actions";
 import { Address, maxUint256, zeroAddress } from "viem";
-import { config } from "@/app/config/wagmi";
+import { wagmiConfig as config } from "@/lib/wallet";
 import { DEXRouter } from "@/app/config";
 import { approve } from "@/lib/actions";
 import { useChainId } from "wagmi";

@@ -1,7 +1,7 @@
 'use client';
 
 import { Address, parseEther, formatEther } from 'viem';
-import { config } from '@/app/config/wagmi';
+import { wagmiConfig as config } from '@/lib/wallet';
 import { DEXRouter, FACTORY } from '@/app/config';
 import { writeContract, readContract } from '@wagmi/core';
 import { waitForTransactionReceipt } from '@wagmi/core';
@@ -10,7 +10,8 @@ import { pulsechain } from '@/lib/chains/pulsechain';
 
 // ABI imports
 import uniswapV2Router from '@/abis/pulsexRouter.json';
-import uniswapV2Factory from '@/abis/uniswapV2Pair.json';
+import uniswapV2Factory from '@/abis/uniswapV2Factory.json';
+import uniswapV2Pair from '@/abis/uniswapV2Pair.json';
 
 export async function addLiquidityETH(
   amountTokenDesired: number,
@@ -117,6 +118,25 @@ export async function getPair(tokenA: Token, tokenB: Token): Promise<Address> {
     return pairAddress;
   } catch (error) {
     console.error('getPair error:', error);
+    throw error;
+  }
+}
+
+export async function getReserves(pairAddress: Address): Promise<{ reserve0: bigint; reserve1: bigint; blockTimestampLast: number }> {
+  try {
+    const reserves = await readContract(config, {
+      address: pairAddress,
+      abi: uniswapV2Pair.abi,
+      functionName: 'getReserves',
+    }) as [bigint, bigint, number];
+
+    return {
+      reserve0: reserves[0],
+      reserve1: reserves[1],
+      blockTimestampLast: reserves[2]
+    };
+  } catch (error) {
+    console.error('getReserves error:', error);
     throw error;
   }
 }
@@ -341,6 +361,36 @@ export async function getAmountsOutFromDEX(
     return amountOut;
   } catch (error) {
     console.error('getAmountsOutFromDEX error:', error);
+    throw error;
+  }
+}
+
+// Test function to verify getPair and getReserves work correctly
+export async function testGetPairAndReserves(tokenA: Token, tokenB: Token) {
+  try {
+    console.log('Testing getPair and getReserves functionality...');
+
+    // 1. Get pair address from factory
+    console.log('1. Getting pair address from factory...');
+    const pairAddress = await getPair(tokenA, tokenB);
+    console.log(`Pair address: ${pairAddress}`);
+
+    if (pairAddress === '0x0000000000000000000000000000000000000000') {
+      console.log('Pair does not exist - this is expected for some token pairs');
+      return { pairExists: false, pairAddress, reserves: null };
+    }
+
+    // 2. Get reserves from pair contract
+    console.log('2. Getting reserves from pair contract...');
+    const reserves = await getReserves(pairAddress);
+    console.log(`Reserve0: ${reserves.reserve0}`);
+    console.log(`Reserve1: ${reserves.reserve1}`);
+    console.log(`Block timestamp: ${reserves.blockTimestampLast}`);
+
+    console.log('✅ getPair and getReserves functions are working correctly!');
+    return { pairExists: true, pairAddress, reserves };
+  } catch (error) {
+    console.error('❌ Test failed:', error);
     throw error;
   }
 }

@@ -14,7 +14,7 @@ import { LPPair } from "@/app/types/pair";
 import { useAccount } from "wagmi";
 import { Address } from "viem";
 import { erc20Abi } from "viem";
-import { config } from "@/app/config/wagmi";
+import { wagmiConfig as config } from "@/lib/wallet";
 import { multicall } from "@wagmi/core";
 import LoadingGif from "@/app/components/swap/loadingGif";
 import BottomBar from "@/app/components/bottomBar";

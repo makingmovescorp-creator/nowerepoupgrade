@@ -9,7 +9,7 @@ import LoadingGif from "../components/swap/loadingGif";
 import ActionButton from "../components/swap/ActionButton";
 import { useAccount, useConfig } from "wagmi";
 import TopBar from "../components/swap/topBar";
-import { config } from "@/app/config/wagmi";
+import { wagmiConfig as config } from "@/lib/wallet";
 import { Address } from "viem";
 import {
   deposit,
