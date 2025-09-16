@@ -15,26 +15,26 @@ import {
   deposit,
   claimRewards,
   withdrawCroginal,
-} from "../utils/actions";
+} from "@/lib/actions";
 import { readContract, writeContract } from "@wagmi/core";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { useChainId } from "wagmi";
 import TokenModal from "../components/swap/tokenModal";
 import { GiCheckMark } from "react-icons/gi";
-import { PAIR_ABI } from "../utils";
+import { PAIR_ABI } from "@/lib/utils";
 import YourLockedValue from "../components/staking/YourLockedValue";
 import { pulsechain } from "@/lib/chains/pulsechain";
-// import { getRewardInfo } from "../utils/actions";
+// import { getRewardInfo } from "@/lib/actions";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { CRO, CROGINAL } from "../abis/Tokens";
-import useLPPair from "../hooks/useLPPair";
+import useLPPair from "@/hooks/useLPPair";
 import { Token } from "../types";
-import { useStakerInfo } from "../hooks/useStakerInfo";
+import { useStakerInfo } from "@/hooks/useStakerInfo";
 import { ethers } from "ethers";
-import { useApprovedStatusPair } from "../hooks/useApprovedStatusPair";
+import { useApprovedStatusPair } from "@/hooks/useApprovedStatusPair";
 import { TiWarning } from "react-icons/ti";
 import { useMemo } from "react";
-import useLPStatusByAccount from "../hooks/useLPStatusByAccount";
+import useLPStatusByAccount from "@/hooks/useLPStatusByAccount";
 
 export default function Home() {
   const [baseToken, setBaseToken] = useState(CRO);

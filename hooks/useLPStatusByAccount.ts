@@ -13,6 +13,9 @@ export default function useLPStatusByAccount(
 ) {
   const [balance, setBalance] = useState(0);
   const [totalSupply, setTotalSupply] = useState(0);
+  const [receiveBaseAmount, setReceiveBaseAmount] = useState(0);
+  const [receiveQuoteAmount, setReceiveQuoteAmount] = useState(0);
+  const [receiveOutOrder, setReceiveOutOrder] = useState(false);
   const { address } = useAccount();
 
   useEffect(() => {
@@ -46,17 +49,37 @@ export default function useLPStatusByAccount(
           args: [],
         }) as bigint;
 
-        setBalance(Number(formatEther(userBalance)));
-        setTotalSupply(Number(formatEther(totalSupplyResult)));
+        const balanceValue = Number(formatEther(userBalance));
+        const totalSupplyValue = Number(formatEther(totalSupplyResult));
+
+        setBalance(balanceValue);
+        setTotalSupply(totalSupplyValue);
+
+        // Calculate receive amounts (placeholder logic)
+        if (balanceValue > 0 && totalSupplyValue > 0) {
+          // This is placeholder logic - you might need to implement actual reserve calculation
+          setReceiveBaseAmount(balanceValue * 0.5); // Placeholder
+          setReceiveQuoteAmount(balanceValue * 0.5); // Placeholder
+          setReceiveOutOrder(false); // Placeholder
+        }
       } catch (error) {
         console.error('Error fetching LP status:', error);
         setBalance(0);
         setTotalSupply(0);
+        setReceiveBaseAmount(0);
+        setReceiveQuoteAmount(0);
+        setReceiveOutOrder(false);
       }
     };
 
     fetchLPStatus();
   }, [pairAddress, address, baseToken]);
 
-  return { balance, totalSupply };
+  return {
+    balance,
+    totalSupply,
+    receiveBaseAmount,
+    receiveQuoteAmount,
+    receiveOutOrder
+  };
 }

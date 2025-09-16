@@ -5,14 +5,14 @@ import erc20 from '@/abis/erc20.json';
 const client = createPublicClient({ chain: pulsechain, transport: http('https://rpc.pulsechain.com') });
 
 export async function readDecimals(token: Address) {
-  return await client.readContract({ address: token, abi: erc20.abi as any, functionName: 'decimals' }) as number;
+  return await client.readContract({ address: token, abi: erc20.abi as any, functionName: 'decimals', args: [] }) as number;
 }
 export async function readSymbol(token: Address) {
-  try { return await client.readContract({ address: token, abi: erc20.abi as any, functionName: 'symbol' }) as string; }
+  try { return await client.readContract({ address: token, abi: erc20.abi as any, functionName: 'symbol', args: [] }) as string; }
   catch { return 'TKN'; }
 }
 export async function readName(token: Address) {
-  try { return await client.readContract({ address: token, abi: erc20.abi as any, functionName: 'name' }) as string; }
+  try { return await client.readContract({ address: token, abi: erc20.abi as any, functionName: 'name', args: [] }) as string; }
   catch { return 'Token'; }
 }
 export async function readBalance(token: Address, owner: Address) {

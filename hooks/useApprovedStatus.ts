@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Address } from 'viem';
 import { readContract } from '@wagmi/core';
 import { config } from '@/app/config/wagmi';
+import { useAccount } from 'wagmi';
 import type { Token } from '@/app/types';
 
 export function useApprovedStatus(
@@ -12,10 +13,11 @@ export function useApprovedStatus(
   isProcessing: boolean
 ): boolean {
   const [isApproved, setIsApproved] = useState(false);
+  const { address } = useAccount();
 
   useEffect(() => {
     const checkApproval = async () => {
-      if (!token || token.isNative || amount <= 0 || isProcessing) {
+      if (!token || token.isNative || amount <= 0 || isProcessing || !address) {
         setIsApproved(true);
         return;
       }
@@ -40,7 +42,7 @@ export function useApprovedStatus(
           address: token.address as Address,
           abi: erc20Abi,
           functionName: 'allowance',
-          args: [config.address || '0x0000000000000000000000000000000000000000', DEXRouter],
+          args: [address, DEXRouter],
         }) as bigint;
 
         const amountWei = BigInt(amount * Math.pow(10, token.decimal));
@@ -52,7 +54,7 @@ export function useApprovedStatus(
     };
 
     checkApproval();
-  }, [token, amount, isProcessing]);
+  }, [token, amount, isProcessing, address]);
 
   return isApproved;
 }

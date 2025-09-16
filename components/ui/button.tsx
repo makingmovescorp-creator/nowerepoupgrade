@@ -8,19 +8,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 export function Button({ className, variant = 'primary', ...props }: Props) {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-  const base = 'w-full rounded-2xl py-3 transition duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed';
-=======
   const base = 'w-full rounded-lg py-3 transition duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed';
->>>>>>> Stashed changes
-=======
-  const base = 'w-full rounded-lg py-3 transition duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed';
->>>>>>> Stashed changes
-=======
-  const base = 'w-full rounded-lg py-3 transition duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed';
->>>>>>> Stashed changes
   const styles = {
     primary: 'bg-emerald-600 hover:bg-emerald-500 text-white',
     ghost: 'bg-white/5 hover:bg-white/10',
