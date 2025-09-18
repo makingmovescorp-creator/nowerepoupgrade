@@ -13,7 +13,7 @@ export default function ExplorerPage() {
             <img
               src="/img/pulsexpro-white.avif"
               alt="PulseX Pro"
-              className="h-8 w-auto"
+              className="h-7 w-auto"
             />
             <nav className="hidden md:flex items-center gap-3 text-sm text-neutral-400">
               <a href="/" className="px-2 py-1 rounded-md hover:bg-white/5 cursor-pointer transition-colors">Trade</a>

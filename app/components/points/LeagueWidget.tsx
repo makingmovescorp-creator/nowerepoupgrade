@@ -106,7 +106,7 @@ export default function LeagueWidget() {
 
           {/* Current Points */}
           <div className="mb-4">
-            <div className="text-2xl font-bold text-white">
+            <div className="text-xl font-bold text-white">
               {totalPoints.toLocaleString()}
             </div>
             <div className="text-sm text-neutral-400">

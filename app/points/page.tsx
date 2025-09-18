@@ -1,19 +1,14 @@
 "use client";
 
-import { Suspense, useState, useEffect } from "react";
-import { useAccount } from "wagmi";
-import { Card } from "@/components/ui/card";
+import { Suspense, useEffect } from "react";
 import ConnectWallet from "@/app/components/ConnectWallet";
 import BridgeButton from "@/app/components/BridgeButton";
 import ShaderBackground from "@/app/components/ShaderBackground";
 import PointsDisplay from "@/app/components/points/PointsDisplay";
-import TransactionHistory from "@/app/components/points/TransactionHistory";
 import LeagueWidget from "@/app/components/points/LeagueWidget";
 import TreasuryValueWidget from "@/app/components/points/TreasuryValueWidget";
 
 export default function PointsPage() {
-  const { isConnected, address } = useAccount();
-  const [activeTab, setActiveTab] = useState<"overview" | "history">("overview");
 
   return (
     <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
@@ -33,7 +28,7 @@ export default function PointsPage() {
               <img
                 src="/img/pulsexpro-white.avif"
                 alt="PulseX Pro"
-                className="h-8 w-auto"
+                className="h-7 w-auto"
               />
               <nav className="hidden md:flex items-center gap-3 text-sm text-neutral-400">
                 <a href="/" className="px-2 py-1 rounded-md hover:bg-white/5 cursor-pointer transition-colors">Trade</a>
@@ -81,70 +76,19 @@ export default function PointsPage() {
         </header>
 
         {/* Main content */}
-        <div className="mx-auto max-w-[1400px] px-4 py-8">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">PulseX Points</h1>
-            <p className="text-neutral-400">Earn points by trading through PulseX Fee Wrapper</p>
-          </div>
-
-          <div className="space-y-8">
-            {/* Main content area */}
-            <div className="space-y-6">
-              {!isConnected ? (
-                <div className="flex flex-col items-center justify-center py-16">
-                  <Card className="p-8 bg-black/40 border-white/10 backdrop-blur-xl">
-                    <h2 className="text-xl font-semibold text-white mb-4">Connect Your Wallet</h2>
-                    <p className="text-neutral-400 mb-6">Connect your wallet to view your trading points and transaction history.</p>
-                    <ConnectWallet />
-                  </Card>
-                </div>
-              ) : (
-                <>
-                  {/* Tab navigation */}
-                  <div className="flex justify-center">
-                    <div className="flex bg-black/40 border border-white/10 rounded-lg p-1 backdrop-blur-xl">
-                      <button
-                        onClick={() => setActiveTab("overview")}
-                        className={`px-6 py-2 rounded-md transition-all ${
-                          activeTab === "overview"
-                            ? "bg-white/10 text-white"
-                            : "text-neutral-400 hover:text-white hover:bg-white/5"
-                        }`}
-                      >
-                        Overview
-                      </button>
-                      <button
-                        onClick={() => setActiveTab("history")}
-                        className={`px-6 py-2 rounded-md transition-all ${
-                          activeTab === "history"
-                            ? "bg-white/10 text-white"
-                            : "text-neutral-400 hover:text-white hover:bg-white/5"
-                        }`}
-                      >
-                        Transaction History
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Tab content */}
-                  <div className="min-h-[400px]">
-                    {activeTab === "overview" && <PointsDisplay />}
-                    {activeTab === "history" && <TransactionHistory />}
-                  </div>
-                </>
-              )}
-            </div>
-
+        <div className="mx-auto max-w-[1600px] px-1 py-1">
+          <div className="space-y-2">
             {/* Bottom widgets section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* League Widget */}
-              <div>
-                <LeagueWidget />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+              {/* Left side - Points Display and Treasury Value */}
+              <div className="space-y-2">
+                <PointsDisplay />
+                <TreasuryValueWidget />
               </div>
 
-              {/* Treasury Value Widget */}
+              {/* Right side - League Widget */}
               <div>
-                <TreasuryValueWidget />
+                <LeagueWidget />
               </div>
             </div>
           </div>

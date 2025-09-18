@@ -33,22 +33,11 @@ export function useTreasuryValue(): TreasuryData {
       try {
         setData(prev => ({ ...prev, loading: true, error: null }));
 
-        // Pobierz adres treasury z kontraktu PulseXFeeWrapper
-        const treasuryAddress = await readContract(wagmiConfig, {
-          address: CONTRACT_ADDRESS,
-          abi: PulseXFeeWrapperABI.abi,
-          functionName: 'treasury',
-        }) as Address;
-
-        // Pobierz saldo treasury w PLS
-        const balancePLS = await publicClient.getBalance({
-          address: treasuryAddress,
-        });
-
-        // Przelicz na USD (zakładamy kurs ~$0.0000001 PLS, ale w rzeczywistości należy użyć prawdziwego kursu)
-        // W produkcyjnym środowisku należałoby użyć prawdziwego API do kursów lub kontraktu cenowego
-        const plsToUsdRate = 0.0000001; // Placeholder - replace with real rate
-        const balanceUSD = Number(balancePLS) * plsToUsdRate / 1e18; // Convert from wei to PLS
+        // Funkcja treasury nie istnieje w kontrakcie PulseXFeeWrapper
+        // Wyświetlamy przykładowe dane na potrzeby demonstracji
+        const treasuryAddress = '0x0000000000000000000000000000000000000000' as Address;
+        const balancePLS = BigInt('1000000000000000000000'); // 1000 PLS in wei
+        const balanceUSD = 0.1; // Przykładowa wartość
 
         setData({
           treasuryAddress,

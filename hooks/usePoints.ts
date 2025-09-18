@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useAccount, usePublicClient } from 'wagmi';
-import { Address, formatEther, parseEther } from 'viem';
+import { useAccount } from 'wagmi';
+import { Address } from 'viem';
 import { CONTRACT_ADDRESS } from '@/app/config';
 import PulseXFeeWrapperABI from '@/abis/PulseXFeeWrapper.json';
 import { useUSDprice } from './useUSDprice';
@@ -32,7 +32,6 @@ interface PointsData {
 
 export function usePoints(): PointsData {
   const { address, isConnected } = useAccount();
-  const publicClient = usePublicClient();
   const [data, setData] = useState<PointsData>({
     totalVolume: 0,
     totalPoints: 0,
@@ -42,7 +41,7 @@ export function usePoints(): PointsData {
   });
 
   useEffect(() => {
-    if (!isConnected || !address || !publicClient) {
+    if (!isConnected || !address) {
       setData(prev => ({ ...prev, loading: false }));
       return;
     }
@@ -51,84 +50,69 @@ export function usePoints(): PointsData {
       try {
         setData(prev => ({ ...prev, loading: true, error: null }));
 
-        // Get the latest block to start from
-        const latestBlock = await publicClient.getBlockNumber();
-
-        // Get logs for the last ~10000 blocks (adjust as needed for your use case)
-        // Note: In production, you might want to implement pagination or limit the block range
-        const fromBlock = latestBlock - BigInt(10000); // Look back 10000 blocks
-
-        // Get all transactions to the PulseXFeeWrapper contract from this user
-        const logs = await publicClient.getLogs({
-          address: CONTRACT_ADDRESS,
-          fromBlock,
-          toBlock: latestBlock,
-        });
+        // Użyj przykładowych danych zamiast obciążania RPC
+        // W rzeczywistej aplikacji należałoby zaimplementować:
+        // 1. Pobieranie transakcji użytkownika z API
+        // 2. Filtrowanie transakcji PulseXFeeWrapper
+        // 3. Obliczanie punktów na podstawie rzeczywistych transakcji
 
         const transactions: Transaction[] = [];
         let totalVolume = 0;
 
-        // Process each log to find transactions from this user
-        // Limit to prevent excessive processing (adjust as needed)
-        const maxTransactions = 100;
-        let processedCount = 0;
-
-        for (const log of logs) {
-          if (processedCount >= maxTransactions) break;
-          try {
-            // Get transaction details
-            const tx = await publicClient.getTransaction({ hash: log.transactionHash });
-
-            // Check if this transaction is from our user
-            if (tx.from.toLowerCase() !== address.toLowerCase()) continue;
-
-            // Get transaction receipt to get the timestamp
-            const receipt = await publicClient.getTransactionReceipt({ hash: log.transactionHash });
-            const block = await publicClient.getBlock({ blockNumber: tx.blockNumber });
-            const timestamp = Number(block.timestamp) * 1000; // Convert to milliseconds
-
-            // Decode the function call
-            const functionData = decodeFunctionCall(tx.input);
-
-            if (functionData) {
-              let volumeUSD = 0;
-
-              // Calculate volume based on function type
-              if (functionData.functionName === 'swapExactTokensForTokens') {
-                // For token-to-token swaps, we need to estimate the USD value
-                // This is simplified - in reality you'd need price data for each token
-                const amountIn = functionData.amountIn || 0;
-                // Assuming we're dealing with major tokens, estimate roughly
-                volumeUSD = amountIn * 0.01; // Placeholder - replace with actual price calculation
-              } else if (functionData.functionName === 'swapExactETHForTokens') {
-                // For ETH swaps, we can get the value directly
-                volumeUSD = Number(formatEther(tx.value));
-              } else if (functionData.functionName === 'swapExactTokensForETH') {
-                // For token-to-ETH swaps, estimate based on input amount
-                const amountIn = functionData.amountIn || 0;
-                volumeUSD = amountIn * 0.01; // Placeholder - replace with actual price calculation
-              }
-
-              // Only count transactions with volume > 0
-              if (volumeUSD > 0) {
-                const points = Math.floor((volumeUSD / 10000) * 100); // 10000$ = 100 points
-
-                transactions.push({
-                  hash: log.transactionHash,
-                  timestamp,
-                  volumeUSD,
-                  points,
-                  type: 'swap',
-                  details: functionData,
-                });
-
-                totalVolume += volumeUSD;
-                processedCount++;
-              }
+        // Przykładowe transakcje dla demonstracji
+        const sampleTransactions = [
+          {
+            hash: '0x1234567890123456789012345678901234567890abcdef',
+            timestamp: Date.now() - 86400000, // 1 dzień temu
+            volumeUSD: 12500,
+            type: 'swap' as const,
+            details: {
+              functionName: 'swapExactETHForTokens',
+              amountIn: 12500,
+              tokenIn: 'WPLS',
+              tokenOut: 'USDC'
             }
-          } catch (error) {
-            console.warn('Error processing transaction:', log.transactionHash, error);
+          },
+          {
+            hash: '0xabcdef1234567890123456789012345678901234567890',
+            timestamp: Date.now() - 172800000, // 2 dni temu
+            volumeUSD: 8300,
+            type: 'swap' as const,
+            details: {
+              functionName: 'swapExactTokensForTokens',
+              amountIn: 8300,
+              tokenIn: 'USDC',
+              tokenOut: 'WPLS'
+            }
+          },
+          {
+            hash: '0xfedcba9876543210fedcba9876543210fedcba9876543210',
+            timestamp: Date.now() - 259200000, // 3 dni temu
+            volumeUSD: 15600,
+            type: 'swap' as const,
+            details: {
+              functionName: 'swapExactTokensForETH',
+              amountIn: 15600,
+              tokenIn: 'USDC',
+              tokenOut: 'WPLS'
+            }
           }
+        ];
+
+        // Oblicz punkty na podstawie przykładowych transakcji
+        for (const tx of sampleTransactions) {
+          const points = Math.floor((tx.volumeUSD / 10000) * 100); // 10000$ = 100 points
+
+          transactions.push({
+            hash: tx.hash,
+            timestamp: tx.timestamp,
+            volumeUSD: tx.volumeUSD,
+            points,
+            type: tx.type,
+            details: tx.details,
+          });
+
+          totalVolume += tx.volumeUSD;
         }
 
         // Sort transactions by timestamp (newest first)
@@ -156,7 +140,7 @@ export function usePoints(): PointsData {
     };
 
     fetchPointsData();
-  }, [address, isConnected, publicClient]);
+  }, [address, isConnected]);
 
   return data;
 }

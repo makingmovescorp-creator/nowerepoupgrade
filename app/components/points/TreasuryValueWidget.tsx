@@ -78,7 +78,7 @@ export default function TreasuryValueWidget() {
             <CurrencyDollarIcon className="w-4 h-4 text-emerald-400" />
             <span className="text-sm text-neutral-300">USD Value</span>
           </div>
-          <div className="text-lg font-semibold text-white">
+          <div className="text-base font-semibold text-white">
             ${formatUSD(balanceUSD)}
           </div>
         </div>
