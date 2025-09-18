@@ -7,8 +7,11 @@ import Providers from './providers';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'PulseX Swap Dashboard',
+  title: 'PulseX PRO',
   description: 'Trading dashboard for PulseChain swaps via PulseX',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

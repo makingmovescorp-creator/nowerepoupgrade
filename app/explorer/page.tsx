@@ -1,39 +1,24 @@
-import { Suspense } from 'react';
-import ChartWidget from '@/app/components/ChartWidget';
-import TradePanel from '@/app/components/TradePanel';
-import PortfolioWidget from '@/app/components/PortfolioWidget';
-import PairSelectWidget from '@/app/components/PairSelectWidget';
-import FavoritePairsBar from '@/app/components/FavoritePairsBar';
+import ShaderBackground from '@/app/components/ShaderBackground';
 import ConnectWallet from '@/app/components/ConnectWallet';
 import BridgeButton from '@/app/components/BridgeButton';
-import ShaderBackground from '@/app/components/ShaderBackground';
-import { Card } from '@/components/ui/card';
 
-export default function Page() {
-  return (
-    <Suspense fallback={<div className="min-h-screen bg-black flex items-center justify-center"><div className="text-white">Loading...</div></div>}>
-      <HomeContent />
-    </Suspense>
-  );
-}
-
-function HomeContent() {
+export default function ExplorerPage() {
   return (
     <main className="min-h-screen text-neutral-100 relative">
       <ShaderBackground />
-      {/* Top bar (Hyperliquid-like) */}
+      {/* Top bar (consistent with main page) */}
       <header className="sticky top-0 z-30 border-b border-white/5 bg-black/40 backdrop-blur-md">
         <div className="mx-auto max-w-[1600px] px-4 py-3 flex items-center justify-between">
-                 <div className="flex items-center gap-4">
-                   <img
-                     src="/img/pulsexpro-white.avif"
-                     alt="PulseX Pro"
-                     className="h-8 w-auto"
-                   />
-                   <nav className="hidden md:flex items-center gap-3 text-sm text-neutral-400">
-              <a href="/" className="px-2 py-1 rounded-md bg-white/10 text-neutral-100">Trade</a>
+          <div className="flex items-center gap-4">
+            <img
+              src="/img/pulsexpro-white.avif"
+              alt="PulseX Pro"
+              className="h-8 w-auto"
+            />
+            <nav className="hidden md:flex items-center gap-3 text-sm text-neutral-400">
+              <a href="/" className="px-2 py-1 rounded-md hover:bg-white/5 cursor-pointer transition-colors">Trade</a>
               <a href="/points" className="px-2 py-1 rounded-md hover:bg-white/5 cursor-pointer transition-colors">Points</a>
-              <a href="/explorer" className="px-2 py-1 rounded-md hover:bg-white/5 cursor-pointer transition-colors">Explorer</a>
+              <a href="/explorer" className="px-2 py-1 rounded-md bg-white/10 text-neutral-100">Explorer</a>
             </nav>
           </div>
           <div className="flex items-center gap-3">
@@ -75,28 +60,15 @@ function HomeContent() {
         </div>
       </header>
 
-      {/* Main content grid */}
-      <div className="mx-auto max-w-[1600px] px-1 py-1 grid grid-cols-12 gap-1 h-[calc(100vh-80px)]">
-        <section className="col-span-12 lg:col-span-9 flex flex-col gap-1">
-          {/* Favorite pairs bar */}
-          <FavoritePairsBar />
-
-          {/* Pair select widget */}
-          <PairSelectWidget />
-
-          {/* Chart section - większa część */}
-          <Card className="flex-[3]">
-            <ChartWidget />
-          </Card>
-
-          {/* Portfolio section - mniejsza część */}
-          <div className="flex-[1]">
-            <PortfolioWidget />
-          </div>
-        </section>
-        <aside className="col-span-12 lg:col-span-3 flex flex-col">
-          <TradePanel />
-        </aside>
+      {/* Explorer content */}
+      <div className="h-[calc(100vh-80px)] w-full">
+        <iframe
+          src="https://ipfs.scan.pulsechain.com"
+          className="w-full h-full border-0"
+          title="PulseChain IPFS Explorer"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-downloads allow-modals"
+        />
       </div>
     </main>
   );

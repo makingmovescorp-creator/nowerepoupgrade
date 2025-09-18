@@ -202,7 +202,7 @@ export default function ExtendedPairSelect() {
 
       {/* Dropdown panel */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-[75vw] max-w-4xl bg-black/40 backdrop-blur-xl border border-white/5 rounded-lg shadow-2xl z-50">
+        <div className="absolute top-full left-0 mt-1 w-[75vw] max-w-4xl bg-black/75 backdrop-blur-xl border border-white/5 rounded-lg shadow-2xl z-50">
           <div className="p-4">
             {/* Header */}
             <div className="grid grid-cols-6 pb-3 border-b border-white/5 text-xs font-medium text-neutral-400" style={{gridTemplateColumns: '24px 1fr 1fr 1fr 1fr 1fr'}}>
