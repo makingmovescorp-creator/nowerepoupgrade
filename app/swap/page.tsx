@@ -84,17 +84,9 @@ export default function Home() {
               onClick={() => {
                 router.push("/liquidity");
               }}
-              className="w-[50%] h-[33px] border border-black-border text-center items-center hover:cursor-pointer"
-            >
-              <h1 className="text-white mt-1">Liquidity</h1>
-            </div>
-            <div
-              onClick={() => {
-                router.push("/staking");
-              }}
               className="w-[50%] h-[33px] border rounded-r-lg border-black-border text-center items-center hover:cursor-pointer"
             >
-              <h1 className="text-white mt-1">Vault</h1>
+              <h1 className="text-white mt-1">Liquidity</h1>
             </div>
           </div>
 

@@ -40,17 +40,24 @@ export default function InputTag(props: any) {
   };
 
   const getTokenIcon = (symbol: string) => {
+    const key = (symbol || '').toUpperCase();
     const iconMap: { [key: string]: string } = {
       'PLS': '/icons/WPLS.avif', // Native PLS uses WPLS icon
       'WPLS': '/icons/WPLS.avif',
       'PLSX': '/icons/plsx.avif',
+      'ETH': '/icons/eth.avif',
       'WETH': '/icons/eth.avif',
       'HEX': '/icons/hex.avif',
-      'pDAI': '/icons/dai.avif',
-      'pUSDC': '/icons/usdc.avif',
-      'pWBTC': '/icons/pwbtc.avif',
+      'EHEX': '/icons/hex.avif',
+      'DAI': '/icons/dai.avif',
+      'PDAI': '/icons/dai.avif',
+      'USDC': '/icons/usdc.avif',
+      'PUSDC': '/icons/usdc.avif',
+      'WBTC': '/icons/pwbtc.avif',
+      'PWBTC': '/icons/pwbtc.avif',
+      'INC': '/icons/inc.avif',
     };
-    return iconMap[symbol] || '/icons/WPLS.avif'; // Default to WPLS icon
+    return iconMap[key] || '/icons/WPLS.avif'; // Default to WPLS icon
   };
 
   return (
@@ -78,7 +85,7 @@ export default function InputTag(props: any) {
           type="number"
           className={`${
             isAmountCalcing ? "text-[#666]" : "text-white"
-          } numberInput bg-transparent disabled:cursor-not-allowed w-[60%] text-left outline-none text-sm font-medium sm:h-[50px] h-[42px] transition-colors`}
+          } numberInput bg-transparent disabled:cursor-not-allowed w-[60%] text-left outline-none text-xs font-medium sm:h-[50px] h-[42px] transition-colors`}
           placeholder="0"
         />
         {showMAXbtn ? (
@@ -100,7 +107,7 @@ export default function InputTag(props: any) {
           <div className="flex items-center justify-center">
             <button
               onClick={openModal}
-              className="w-full inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-white shadow-white/10 focus:outline-none data-[hover]:bg-gray-700 data-[open]:bg-gray-700 data-[focus]:outline-none"
+              className="w-full inline-flex items-center gap-2 py-1.5 px-3 text-xs font-medium text-white shadow-white/10 focus:outline-none data-[hover]:bg-gray-700 data-[open]:bg-gray-700 data-[focus]:outline-none"
             >
               <div className="flex gap-3 place-items-center">
                 <div className="flex justify-center place-items-center relative w-5 h-5 ">
@@ -126,7 +133,7 @@ export default function InputTag(props: any) {
           </div>
         ) : (
           <div className="flex items-center justify-center">
-            <div className="w-full inline-flex items-center gap-2 py-1.5 px-3 text-sm font-medium text-white">
+            <div className="w-full inline-flex items-center gap-2 py-1.5 px-3 text-xs font-medium text-white">
               <div className="flex gap-3 place-items-center">
                 <div className="flex justify-center place-items-center relative w-5 h-5 ">
                   <Image

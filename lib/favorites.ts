@@ -24,11 +24,13 @@ export const useFavoritesStore = create<FavoritesState>()(
           favoritePairs: state.favoritePairs.filter((p) => p !== pairKey),
         })),
       toggleFavorite: (pairKey) =>
-        set((state) => ({
-          favoritePairs: state.favoritePairs.includes(pairKey)
+        set((state) => {
+          const newFavorites = state.favoritePairs.includes(pairKey)
             ? state.favoritePairs.filter((p) => p !== pairKey)
-            : [...state.favoritePairs, pairKey],
-        })),
+            : [...state.favoritePairs, pairKey];
+          console.log('toggleFavorite:', pairKey, 'new favorites:', newFavorites);
+          return { favoritePairs: newFavorites };
+        }),
     }),
     {
       name: 'favorite-pairs',

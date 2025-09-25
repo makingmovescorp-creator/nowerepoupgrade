@@ -6,6 +6,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { ReactNode } from 'react';
 import { wagmiConfig, queryClient, rainbowKitTheme } from '@/lib/wallet';
+import { FeaturedPairsProvider } from '@/hooks/useFeaturedPairsData';
 
 // Guard against double initialization of WalletConnect
 // This prevents "WalletConnect Core is already initialized" errors
@@ -22,7 +23,9 @@ export default function Providers({ children }: { children: ReactNode }) {
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider theme={rainbowKitTheme}>
-          {children}
+          <FeaturedPairsProvider>
+            {children}
+          </FeaturedPairsProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

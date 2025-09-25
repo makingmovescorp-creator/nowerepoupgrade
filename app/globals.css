@@ -126,3 +126,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+.change-value.change-null {
+  color: #a3a3a3 !important;
+}
+
+.change-value.change-positive {
+  color: #10b981 !important;
+}
+
+.change-value.change-negative {
+  color: #ef4444 !important;
+}
+
+.change-value.change-zero {
+  color: #a3a3a3 !important;
+}
+
+/* Infinite scroll animation for favorite pairs */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-375%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 600s linear infinite;
+}

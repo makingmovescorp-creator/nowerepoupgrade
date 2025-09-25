@@ -56,7 +56,7 @@ export default function ConnectWalletButton({
                   <button
                     onClick={openConnectModal}
                     type="button"
-                    className="w-full px-4 py-2 text-white text-sm font-medium rounded-lg transition-all duration-150"
+                    className="w-full px-4 py-2 text-white text-xs font-medium rounded-lg transition-all duration-150"
                     style={{ 
                       background: 'linear-gradient(30deg, rgba(0, 255, 85, 0.8) 0%, rgba(0, 255, 153, 0.8) 100%)',
                       border: 'none'
@@ -81,7 +81,7 @@ export default function ConnectWalletButton({
                   <button
                     onClick={switchChainHandle}
                     type="button"
-                    className="w-full px-4 py-2 text-white text-sm font-medium rounded-lg transition-all duration-150"
+                    className="w-full px-4 py-2 text-white text-xs font-medium rounded-lg transition-all duration-150"
                     style={{ 
                       background: 'linear-gradient(30deg, rgba(0, 255, 85, 0.8) 0%, rgba(0, 255, 153, 0.8) 100%)',
                       border: 'none'
@@ -107,7 +107,7 @@ export default function ConnectWalletButton({
                   <button
                     onClick={openChainModal}
                     type="button"
-                    className="w-full px-4 py-2 text-white text-sm font-medium rounded-lg transition-all duration-150"
+                    className="w-full px-4 py-2 text-white text-xs font-medium rounded-lg transition-all duration-150"
                     style={{ 
                       background: 'linear-gradient(-30deg, rgba(255, 0, 0, 0.8) 0%, rgba(255, 0, 51, 0.8) 100%)',
                       border: 'none'
@@ -136,7 +136,7 @@ export default function ConnectWalletButton({
                   disabled={!callback}
                   className="w-[100%] sm:h-[46px] h-[38px] text-gray-txt transition duration-500 bg-purple hover:bg-purple-bright"
                 >
-                  <h1 className="font-mono text-white sm:text-[21px] text-[18px]">
+                  <h1 className="font-medium text-white text-xs">
                     {text}
                   </h1>
                 </button>

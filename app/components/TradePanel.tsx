@@ -2,6 +2,8 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { createPublicClient, http } from 'viem';
+import { pulsechain } from '@/lib/chains/pulsechain';
 import type { Address } from 'viem';
 import { parseUnits, formatUnits } from 'viem';
 import { useAccount } from 'wagmi';
@@ -38,7 +40,7 @@ export default function TradePanel() {
   const [side, setSide] = useState<SideType>('buy');
 
   const ROUTER = process.env.NEXT_PUBLIC_PULSEX_ROUTER as HexAddress | undefined;
-  const WPLS   = process.env.NEXT_PUBLIC_WPLS as HexAddress | undefined;
+  const WPLS_ADDR = process.env.NEXT_PUBLIC_WPLS as HexAddress | undefined;
   const WRAPPER= process.env.NEXT_PUBLIC_WRAPPER_ADDRESS as HexAddress | undefined;
 
   const [amountIn, setAmountIn] = useState<string>('');
@@ -66,6 +68,47 @@ export default function TradePanel() {
   const [selectedTokenIn, setSelectedTokenIn] = useState<any>(PLS);
   const [selectedTokenOut, setSelectedTokenOut] = useState<any>(WPLS);
 
+  // Minimal ERC20 ABI for fallback metadata
+  const erc20Abi = [
+    {
+      type: 'function',
+      stateMutability: 'view',
+      outputs: [{ type: 'string', name: '' }],
+      name: 'symbol',
+      inputs: [],
+    },
+    {
+      type: 'function',
+      stateMutability: 'view',
+      outputs: [{ type: 'uint8', name: '' }],
+      name: 'decimals',
+      inputs: [],
+    },
+    {
+      type: 'function',
+      stateMutability: 'view',
+      outputs: [{ type: 'string', name: '' }],
+      name: 'name',
+      inputs: [],
+    },
+  ] as const;
+
+  const publicClient = useMemo(() => createPublicClient({ chain: pulsechain, transport: http('https://rpc.pulsechain.com') }), []);
+
+  async function fetchTokenMetadata(address: Address) {
+    try {
+      const [symbol, decimals, name] = await Promise.all([
+        publicClient.readContract({ address, abi: erc20Abi as any, functionName: 'symbol', args: [] }) as Promise<string>,
+        publicClient.readContract({ address, abi: erc20Abi as any, functionName: 'decimals', args: [] }) as Promise<number>,
+        publicClient.readContract({ address, abi: erc20Abi as any, functionName: 'name', args: [] }) as Promise<string>,
+      ]);
+      return { symbol, decimal: Number(decimals) || 18, name };
+    } catch (e) {
+      // Fallback anonymous token
+      return { symbol: 'TOKEN', decimal: 18, name: 'Token' };
+    }
+  }
+
   // Sync with tokens from ExtendedPairSelect
   useEffect(() => {
     if (token0 && token1) {
@@ -80,19 +123,27 @@ export default function TradePanel() {
       if (tokenInFromPair && tokenOutFromPair) {
         setSelectedTokenIn(tokenInFromPair);
         setSelectedTokenOut(tokenOutFromPair);
+      } else {
+        // Fallback: fetch metadata on-chain for any missing token
+        (async () => {
+          const nextIn = tokenInFromPair || (
+            token0 ? { ...(await fetchTokenMetadata(token0 as Address)), address: token0, isNative: false, balance: 0 } : undefined
+          );
+          const nextOut = tokenOutFromPair || (
+            token1 ? { ...(await fetchTokenMetadata(token1 as Address)), address: token1, isNative: false, balance: 0 } : undefined
+          );
+          if (nextIn) setSelectedTokenIn(nextIn);
+          if (nextOut) setSelectedTokenOut(nextOut);
+        })();
       }
     }
   }, [token0, token1]);
 
-  // Determine which token to display based on buy/sell side
+  // Determine which token to display in the editable input based on side
+  // For buy: editable input is the spend token (selectedTokenOut)
+  // For sell: editable input is the sell token (selectedTokenIn)
   const displayToken = useMemo(() => {
-    if (side === 'buy') {
-      // For buy: show the token being bought (output token)
-      return selectedTokenOut;
-    } else {
-      // For sell: show the token being sold (input token)
-      return selectedTokenIn;
-    }
+    return side === 'buy' ? selectedTokenOut : selectedTokenIn;
   }, [side, selectedTokenIn, selectedTokenOut]);
 
   // Determine swap direction based on buy/sell
@@ -108,9 +159,9 @@ export default function TradePanel() {
     }
   }, [side, selectedTokenIn, selectedTokenOut]);
 
-  // Dynamic decimals from selected tokens
-  const decimalsIn = selectedTokenIn?.decimal || 18;
-  const decimalsOut = selectedTokenOut?.decimal || 18;
+  // Decimals based on actual swap direction
+  const decimalsFrom = swapDirection.from?.decimal || 18;
+  const decimalsTo = swapDirection.to?.decimal || 18;
   const displayTokenDecimals = displayToken?.decimal || 18;
 
   // Use swap direction to determine actual token addresses for the swap
@@ -134,24 +185,24 @@ export default function TradePanel() {
 
   const amountParsed = useMemo(() => {
     try { 
-      // Use display token decimals for parsing the input amount
-      return amountIn ? parseUnits(amountIn, displayTokenDecimals) : 0n; 
+      // Parse with input (from) token decimals
+      return amountIn ? parseUnits(amountIn, decimalsFrom) : 0n; 
     }
     catch { return 0n; }
-  }, [amountIn, displayTokenDecimals]);
+  }, [amountIn, decimalsFrom]);
 
   const fee = useMemo(() => (amountParsed * BigInt(FEE_BPS)) / 10_000n, [amountParsed]);
   const net = useMemo(() => (amountParsed > fee ? amountParsed - fee : 0n), [amountParsed, fee]);
 
   const path = useMemo<Address[]>(() => {
-    if (!tokenIn || !tokenOut || !WPLS) return [];
+    if (!tokenIn || !tokenOut || !WPLS_ADDR) return [];
     try {
-      return buildPath(tokenIn as Address, tokenOut as Address, WPLS as Address);
+      return buildPath(tokenIn as Address, tokenOut as Address, WPLS_ADDR as Address);
     } catch (error) {
       console.error('Error building swap path:', error);
       return [];
     }
-  }, [tokenIn, tokenOut, WPLS]);
+  }, [tokenIn, tokenOut, WPLS_ADDR]);
 
   const [quoteOut, setQuoteOut] = useState<bigint>(0n);
   const [outMin, setOutMin] = useState<bigint>(0n);
@@ -159,7 +210,7 @@ export default function TradePanel() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      if (!ROUTER || !WPLS || net === 0n || path.length < 2) {
+      if (!ROUTER || !WPLS_ADDR || net === 0n || path.length < 2) {
         if (!cancelled) { setQuoteOut(0n); setOutMin(0n); setIsAmountCalcing(false); }
         return;
       }
@@ -181,7 +232,7 @@ export default function TradePanel() {
       }
     })();
     return () => { cancelled = true; };
-  }, [ROUTER, WPLS, net, path, slippage]);
+  }, [ROUTER, WPLS_ADDR, net, path, slippage]);
 
   // ALLOWANCE (dla approval -> WRAPPER), włączone dopiero gdy mamy WRAPPER
   const allowance = useAllowance(
@@ -212,7 +263,7 @@ export default function TradePanel() {
       playSound('/sounds/dexswap-dex2.mp3');
       
       // Prepare swap parameters
-      const amountInWei = parseUnits(amountIn, displayTokenDecimals);
+      const amountInWei = parseUnits(amountIn, decimalsFrom);
       const amountOutMinWei = outMin;
       const deadlineBigInt = BigInt(deadline);
       
@@ -291,8 +342,9 @@ export default function TradePanel() {
   );
 
   // USD prices for tokens
-  const tokenInPrice = useUSDprice(selectedTokenIn, parseFloat(amountIn) || 0);
-  const tokenOutPrice = useUSDprice(selectedTokenOut, parseFloat(formatUnits(quoteOut, decimalsOut)) || 0);
+  const inputUSDPrice = useUSDprice(swapDirection.from, parseFloat(amountIn) || 0);
+  const outputAmountNumber = parseFloat(formatUnits(quoteOut, decimalsTo)) || 0;
+  const outputUSDPrice = useUSDprice(swapDirection.to, outputAmountNumber);
 
   // Token balances - use display token for the input field
   const displayTokenBalance = useTokenBalance(displayToken, false);
@@ -300,7 +352,14 @@ export default function TradePanel() {
   const tokenOutBalance = useTokenBalance(selectedTokenOut, false);
 
   // Sound effects
-  const { playSound } = usePlayDEX(isSwapSuccess, false, parseFloat(amountIn) || 0, parseFloat(formatUnits(quoteOut, decimalsOut)) || 0, tokenIn, tokenOut);
+  const { playSound } = usePlayDEX(
+    isSwapSuccess,
+    false,
+    parseFloat(amountIn) || 0,
+    parseFloat(formatUnits(quoteOut, decimalsTo)) || 0,
+    tokenIn,
+    tokenOut
+  );
 
   // Handle transaction confirmation
   useEffect(() => {
@@ -401,39 +460,70 @@ export default function TradePanel() {
 
       {/* Token inputs */}
       <div className="space-y-3">
+        {/* Top row: BUY -> token A (received) read-only; SELL -> token B (received) read-only */}
         <div>
-          <InputTag
-            balance={displayTokenBalance}
-            amount={parseFloat(amountIn) || 0}
-            setAmount={(amount: number) => setAmountIn(amount.toString())}
-            token={displayToken || PLS}
-            opToken={side === 'buy' ? selectedTokenIn : selectedTokenOut}
-            setToken={() => {}}
-            no={0}
-            isAmountCalcing={isAmountCalcing}
-            isInvalid={isInsufficient}
-            setIsInsufficient={setIsInsufficient}
-            USDprice={side === 'buy' ? tokenOutPrice : tokenInPrice}
-            showMAXbtn={true}
-            showTokenSelect={false}
-          />
-          {/* USD value display for input token */}
-          {parseFloat(amountIn) > 0 && (side === 'buy' ? tokenOutPrice : tokenInPrice) > 0 && (
-            <div className="text-right mt-2">
-              <span className="text-xs text-neutral-400 font-mono">
-                ${((side === 'buy' ? tokenOutPrice : tokenInPrice) * parseFloat(amountIn)).toFixed(2)}
-              </span>
-            </div>
+          {side === 'buy' ? (
+            <>
+              <InputTag
+                balance={tokenInBalance}
+                amount={outputAmountNumber}
+                setAmount={() => {}}
+                token={selectedTokenIn || PLS}
+                opToken={selectedTokenOut}
+                setToken={() => {}}
+                no={1}
+                isAmountCalcing={isAmountCalcing}
+                isInvalid={false}
+                setIsInsufficient={() => {}}
+                USDprice={outputUSDPrice}
+                showMAXbtn={false}
+                showTokenSelect={false}
+              />
+              {outputAmountNumber > 0 && outputUSDPrice > 0 && (
+                <div className="text-right mt-2">
+                  <span className="text-xs text-neutral-400 font-mono">
+                    ${(outputUSDPrice * outputAmountNumber).toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <InputTag
+                balance={tokenOutBalance}
+                amount={outputAmountNumber}
+                setAmount={() => {}}
+                token={selectedTokenOut}
+                opToken={selectedTokenIn || PLS}
+                setToken={() => {}}
+                no={1}
+                isAmountCalcing={isAmountCalcing}
+                isInvalid={false}
+                setIsInsufficient={() => {}}
+                USDprice={outputUSDPrice}
+                showMAXbtn={false}
+                showTokenSelect={false}
+              />
+              {outputAmountNumber > 0 && outputUSDPrice > 0 && (
+                <div className="text-right mt-2">
+                  <span className="text-xs text-neutral-400 font-mono">
+                    ${(outputUSDPrice * outputAmountNumber).toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </>
           )}
         </div>
 
+        {/* Percent buttons (based on editable spend token balance) */}
         <div className="flex justify-between items-center mt-5">
           <div className="flex flex-wrap gap-1 sm:gap-2">
             {[10, 25, 50, 75, 100].map((item, index) => (
               <button
                 key={index}
                 onClick={() => {
-                  let amountOfBase = (Number(displayTokenBalance) * item) / 100;
+                  let baseBalance = side === 'buy' ? Number(displayTokenBalance) : Number(displayTokenBalance);
+                  let amountOfBase = (baseBalance * item) / 100;
                   amountOfBase = Math.floor(Number(amountOfBase) * 1000) / 1000;
                   setAmountIn(amountOfBase.toString());
                 }}
@@ -447,30 +537,58 @@ export default function TradePanel() {
           </div>
         </div>
 
-        {/* Show the resulting token amount */}
+        {/* Bottom row: BUY -> token B (spend) editable; SELL -> token A (spend) editable */}
         <div>
-          <InputTag
-            balance={side === 'buy' ? tokenInBalance : tokenOutBalance}
-            amount={parseFloat(formatUnits(quoteOut, decimalsOut)) || 0}
-            setAmount={() => {}} // Read-only for output
-            token={side === 'buy' ? selectedTokenIn : selectedTokenOut}
-            opToken={displayToken}
-            setToken={() => {}}
-            no={1}
-            isAmountCalcing={isAmountCalcing}
-            isInvalid={false}
-            setIsInsufficient={() => {}}
-            USDprice={side === 'buy' ? tokenInPrice : tokenOutPrice}
-            showMAXbtn={false}
-            showTokenSelect={false}
-          />
-          {/* USD value display for output token */}
-          {parseFloat(formatUnits(quoteOut, decimalsOut)) > 0 && (side === 'buy' ? tokenInPrice : tokenOutPrice) > 0 && (
-            <div className="text-right mt-2">
-              <span className="text-xs text-neutral-400 font-mono">
-                ${((side === 'buy' ? tokenInPrice : tokenOutPrice) * parseFloat(formatUnits(quoteOut, decimalsOut))).toFixed(2)}
-              </span>
-            </div>
+          {side === 'buy' ? (
+            <>
+              <InputTag
+                balance={tokenOutBalance}
+                amount={parseFloat(amountIn) || 0}
+                setAmount={(amount: number) => setAmountIn(amount.toString())}
+                token={selectedTokenOut}
+                opToken={selectedTokenIn || PLS}
+                setToken={() => {}}
+                no={0}
+                isAmountCalcing={isAmountCalcing}
+                isInvalid={isInsufficient}
+                setIsInsufficient={setIsInsufficient}
+                USDprice={inputUSDPrice}
+                showMAXbtn={true}
+                showTokenSelect={false}
+              />
+              {parseFloat(amountIn) > 0 && inputUSDPrice > 0 && (
+                <div className="text-right mt-2">
+                  <span className="text-xs text-neutral-400 font-mono">
+                    ${(inputUSDPrice * parseFloat(amountIn)).toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <InputTag
+                balance={tokenInBalance}
+                amount={parseFloat(amountIn) || 0}
+                setAmount={(amount: number) => setAmountIn(amount.toString())}
+                token={selectedTokenIn || PLS}
+                opToken={selectedTokenOut}
+                setToken={() => {}}
+                no={0}
+                isAmountCalcing={isAmountCalcing}
+                isInvalid={isInsufficient}
+                setIsInsufficient={setIsInsufficient}
+                USDprice={inputUSDPrice}
+                showMAXbtn={true}
+                showTokenSelect={false}
+              />
+              {parseFloat(amountIn) > 0 && inputUSDPrice > 0 && (
+                <div className="text-right mt-2">
+                  <span className="text-xs text-neutral-400 font-mono">
+                    ${(inputUSDPrice * parseFloat(amountIn)).toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -517,7 +635,7 @@ export default function TradePanel() {
               PulseX V1/V2 (0.29%) + Taker fee (0.01%)
             </div>
           </span>
-          <span className="text-white font-mono">{formatUnits(fee, displayTokenDecimals)}</span>
+          <span className="text-white font-mono">{formatUnits(fee, decimalsFrom)}</span>
         </div>
         <div className="flex justify-between">
           <span className="group relative border-b border-dashed border-neutral-400 text-neutral-400 font-medium">
@@ -526,15 +644,15 @@ export default function TradePanel() {
               PulseXFeeWrapper fee for enhanced functionality
             </div>
           </span>
-          <span className="text-white font-mono">{formatUnits((amountParsed * BigInt(10)) / 10_000n, displayTokenDecimals)}</span>
+          <span className="text-white font-mono">{formatUnits((amountParsed * BigInt(10)) / 10_000n, decimalsFrom)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-neutral-400 font-medium">Net in</span>
-          <span className="text-white font-mono">{formatUnits(net, displayTokenDecimals)}</span>
+          <span className="text-white font-mono">{formatUnits(net, decimalsFrom)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-neutral-400 font-medium">Min out</span>
-          <span className="text-white font-mono">{formatUnits(outMin, decimalsOut)}</span>
+          <span className="text-white font-mono">{formatUnits(outMin, decimalsTo)}</span>
         </div>
         <div className="flex justify-between">
           <span className="text-neutral-400 font-medium">Deadline</span>
@@ -550,7 +668,7 @@ export default function TradePanel() {
               Minimum output
             </span>
             <span className="text-white font-mono">
-              {parseFloat(formatUnits(outMin, decimalsOut)).toFixed(2)}
+              {parseFloat(formatUnits(outMin, decimalsTo)).toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between">
@@ -558,7 +676,7 @@ export default function TradePanel() {
               Expected output
             </span>
             <span className="text-white font-mono">
-              {parseFloat(formatUnits(quoteOut, decimalsOut)).toFixed(2)}
+              {parseFloat(formatUnits(quoteOut, decimalsTo)).toFixed(2)}
             </span>
           </div>
         </div>

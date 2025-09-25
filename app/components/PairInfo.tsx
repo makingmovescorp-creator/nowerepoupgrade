@@ -1,61 +1,30 @@
 'use client';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useSwapState } from '@/lib/state';
-
-type PairData = {
-  mark: number;
-  change24h: number;
-  volume24h: number;
-};
-
-// Mock data for different pairs
-const MOCK_PAIR_DATA: Record<string, PairData> = {
-  'plsx-wpls': {
-    mark: 0.00095,
-    change24h: 2.45,
-    volume24h: 1250000
-  },
-  'weth-wpls': {
-    mark: 95.2,
-    change24h: -1.23,
-    volume24h: 850000
-  },
-  'hex-wpls': {
-    mark: 0.0508,
-    change24h: 5.67,
-    volume24h: 2100000
-  }
-};
+import { useFeaturedPairs } from '@/hooks/useFeaturedPairsData';
+import { fmtUsd, fmtPct } from '@/lib/format';
+import { FEATURED_PAIRS, type FeaturedKey } from '@/data/pairs';
 
 export default function PairInfo() {
   const sp = useSearchParams();
   const { selectedKey } = useSwapState();
-  
-  const pairKey = sp.get('pair') || selectedKey || 'plsx-wpls';
-  const pairData = MOCK_PAIR_DATA[pairKey] || MOCK_PAIR_DATA['plsx-wpls'];
+  const { data: pairsData, loading } = useFeaturedPairs();
+  const [hasInitialData, setHasInitialData] = useState(false);
 
-  const formatPrice = (price: number) => {
-    if (price < 0.01) {
-      return price.toFixed(6);
-    } else if (price < 1) {
-      return price.toFixed(4);
-    } else {
-      return price.toFixed(2);
+  const pairKey = (selectedKey || sp.get('pair') || 'plsx-wpls') as FeaturedKey;
+
+  // Track initial data load
+  useEffect(() => {
+    if (!loading && pairsData && pairsData[pairKey] !== undefined) {
+      setHasInitialData(true);
     }
-  };
+  }, [loading, pairsData, pairKey]);
 
-  const formatVolume = (volume: number) => {
-    if (volume >= 1000000) {
-      return `${(volume / 1000000).toFixed(1)}M`;
-    } else if (volume >= 1000) {
-      return `${(volume / 1000).toFixed(1)}K`;
-    }
-    return volume.toString();
-  };
+  // Get data for the selected pair from context
+  const dexPair = pairsData[pairKey];
 
-  const changeColor = pairData.change24h >= 0 ? 'text-emerald-400' : 'text-red-400';
-  const changeBg = pairData.change24h >= 0 ? 'bg-emerald-500/10' : 'bg-red-500/10';
+  const change24h = dexPair?.priceChange?.h24 ?? undefined;
 
   return (
     <div className="flex items-center gap-12">
@@ -63,15 +32,15 @@ export default function PairInfo() {
       <div className="flex flex-col">
         <div className="text-xs text-neutral-400">Mark</div>
         <div className="text-xs font-light text-white">
-          ${formatPrice(pairData.mark)}
+          {!hasInitialData && loading ? '...' : fmtUsd(dexPair?.priceUsd)}
         </div>
       </div>
 
       {/* 24h Change */}
       <div className="flex flex-col">
         <div className="text-xs text-neutral-400">24h Change</div>
-        <div className={`text-xs font-light ${changeColor}`}>
-          {pairData.change24h >= 0 ? '+' : ''}{pairData.change24h.toFixed(2)}%
+        <div className={`text-xs font-light change-value ${change24h == null ? 'change-null' : change24h > 0 ? 'change-positive' : change24h < 0 ? 'change-negative' : 'change-zero'}`}>
+          {!hasInitialData && loading ? '...' : fmtPct(change24h)}
         </div>
       </div>
 
@@ -79,7 +48,7 @@ export default function PairInfo() {
       <div className="flex flex-col">
         <div className="text-xs text-neutral-400">24h Volume</div>
         <div className="text-xs font-light text-white">
-          ${formatVolume(pairData.volume24h)}
+          {!hasInitialData && loading ? '...' : fmtUsd(dexPair?.volume?.h24)}
         </div>
       </div>
     </div>

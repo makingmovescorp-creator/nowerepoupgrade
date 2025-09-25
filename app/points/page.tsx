@@ -80,10 +80,10 @@ export default function PointsPage() {
           <div className="space-y-2">
             {/* Bottom widgets section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-              {/* Left side - Points Display and Treasury Value */}
+              {/* Left side - Treasury Value and Points Display */}
               <div className="space-y-2">
-                <PointsDisplay />
                 <TreasuryValueWidget />
+                <PointsDisplay />
               </div>
 
               {/* Right side - League Widget */}

@@ -3,7 +3,7 @@ import type { ChartOptions, DeepPartial, CandlestickSeriesOptions, IChartApi } f
 
 export const HL_CHART_OPTIONS: DeepPartial<ChartOptions> = {
   layout: {
-    background: { type: 'solid', color: '#131a1f' } as any,
+    background: { type: 'solid', color: '#0f0f0f' } as any,
     textColor: '#d4d4d4',
     fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI',
   },

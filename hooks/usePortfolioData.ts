@@ -95,7 +95,7 @@ export function usePortfolioData() {
         // 3. Calculate user's share and liquidity
         setLiquidityPools([
           {
-            poolAddress: '0x149b2c629e652f2e89e11cd57e5d4d77ee166f9f',
+            poolAddress: '0x1b45b9148791d3a104184Cd5DFE5CE57193a3ee9',
             token0: 'PLSX',
             token1: 'WPLS',
             token0Symbol: 'PLSX',

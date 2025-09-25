@@ -19,7 +19,6 @@ const factoryAddr = process.env.NEXT_PUBLIC_PULSEX_FACTORY;
 export const DEXRouter = routerAddr as Address;
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_WRAPPER_ADDRESS as Address;
 export const FACTORY = factoryAddr as Address;
-export const STAKING_ADDRESS = process.env.NEXT_PUBLIC_STAKING_ADDRESS as Address;
 
 export const nativeCoin = TOKEN_LIST[0]
 export const currentChain = pulsechain;

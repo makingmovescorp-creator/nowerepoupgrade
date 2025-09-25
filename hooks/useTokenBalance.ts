@@ -1,29 +1,27 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useBalance } from 'wagmi';
+import { useAccount, useBalance } from 'wagmi';
 import type { Address } from 'viem';
 
 export function useTokenBalance(token: any, isSwapping: boolean) {
-  const [balance, setBalance] = useState(0);
+  const { address } = useAccount();
 
-  // Mock balance hook - replace with real balance fetching
-  useEffect(() => {
-    // Mock balance calculation
-    const mockBalances: Record<string, number> = {
-      'PLSX': 1000.0,
-      'WPLS': 5000.0,
-      'WETH': 2.5,
-      'HEX': 10000.0,
-      'DAI': 500.0,
-      'USDC': 1000.0,
-      'pWBTC': 0.1,
-      'pDAI': 250.0
-    };
+  const native = useBalance({
+    address: address as Address | undefined,
+    watch: true,
+    enabled: Boolean(address) && Boolean(token?.isNative),
+  });
 
-    const tokenSymbol = token?.symbol || 'UNKNOWN';
-    const tokenBalance = mockBalances[tokenSymbol] || 0;
-    setBalance(tokenBalance);
-  }, [token, isSwapping]);
+  const erc20 = useBalance({
+    address: address as Address | undefined,
+    token: token && !token?.isNative ? (token.address as Address | undefined) : undefined,
+    watch: true,
+    enabled: Boolean(address) && Boolean(token && !token?.isNative && token?.address),
+  });
 
-  return balance;
+  const data = token?.isNative ? native.data : erc20.data;
+  const formatted = data?.formatted ? parseFloat(data.formatted) : 0;
+
+  void isSwapping;
+
+  return formatted;
 }

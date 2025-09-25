@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { useAccount } from "wagmi";
 import { usePoints } from "@/hooks/usePoints";
-import { getLeagueIcon, getLeagueColor } from "./LeagueIcons";
+import { getLeagueColor } from "./LeagueIcons";
 
 interface League {
   name: string;
@@ -20,19 +20,19 @@ const LEAGUES: League[] = [
     description: "Elite trader"
   },
   {
-    name: "Diamond League",
+    name: "Gold League",
     minPoints: 600,
     maxPoints: 799,
     description: "Advanced trader"
   },
   {
-    name: "Gold League",
+    name: "Silver League",
     minPoints: 400,
     maxPoints: 599,
     description: "Experienced trader"
   },
   {
-    name: "Silver League",
+    name: "Stone League",
     minPoints: 200,
     maxPoints: 399,
     description: "Growing trader"
@@ -85,19 +85,12 @@ export default function LeagueWidget() {
   const currentLeague = getCurrentLeague(totalPoints);
   const nextLeague = getNextLeague(currentLeague);
   const progress = getProgressToNextLeague(totalPoints, currentLeague);
-  const IconComponent = getLeagueIcon(currentLeague.name);
   const leagueColors = getLeagueColor(currentLeague.name);
 
   return (
     <div className="h-full bg-black/40 backdrop-blur-md border border-white/5 rounded-lg">
       <div className="p-4">
         <div className="text-center">
-          {/* League Icon */}
-          <div className="mb-4">
-            <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-black/20 ${leagueColors.iconBg}`}>
-              <IconComponent className="w-8 h-8" />
-            </div>
-          </div>
 
           {/* League Name */}
           <h3 className={`text-lg font-semibold mb-2 ${leagueColors.textColor}`}>
