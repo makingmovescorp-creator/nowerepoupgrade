@@ -7,15 +7,19 @@ export function useTokenBalance(token: any, isSwapping: boolean) {
 
   const native = useBalance({
     address: address as Address | undefined,
-    watch: true,
-    enabled: Boolean(address) && Boolean(token?.isNative),
+    query: {
+      enabled: Boolean(address) && Boolean(token?.isNative),
+      refetchInterval: 8000,
+    },
   });
 
   const erc20 = useBalance({
     address: address as Address | undefined,
     token: token && !token?.isNative ? (token.address as Address | undefined) : undefined,
-    watch: true,
-    enabled: Boolean(address) && Boolean(token && !token?.isNative && token?.address),
+    query: {
+      enabled: Boolean(address) && Boolean(token && !token?.isNative && token?.address),
+      refetchInterval: 8000,
+    },
   });
 
   const data = token?.isNative ? native.data : erc20.data;
